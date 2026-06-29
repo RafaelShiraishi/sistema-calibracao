@@ -2,7 +2,7 @@
   "build": {
     "builder": "nixpacks"
   },
-  "nixpacks": {
-    "providers": [php]
+  "deploy": {
+    "startCommand": "php -S 0.0.0.0:$PORT"
   }
 }
