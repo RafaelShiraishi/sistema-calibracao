@@ -1,15 +1,20 @@
 <?php
-$host = "mysql.railway.internal";
-$usuario = "root";
-$senha = "uKEXtVTcbibczwSvCRolXqFEzioLShPi";
-$banco = "railway";
-$porta = "3306";
+mysqli_report(MYSQLI_REPORT_OFF);
 
-$mysql = new mysqli($host, $usuario, $senha, $banco, $porta);
+$host = getenv('MYSQLHOST') ?: "mysql.railway.internal";
+$usuario = getenv('MYSQLUSER') ?: "root";
+$senha = getenv('MYSQLPASSWORD') ?: "uKEXtVTcbibczwSvCRolXqFEzioLShPi";
+$banco = getenv('MYSQLDATABASE') ?: "railway";
+$porta = getenv('MYSQLPORT') ?: "3306";
 
-if ($mysqli->connect_errno){
-  echo "Falha ao conectar: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+$mysqli = mysqli_init();
+if (!$mysqli) {
+  die("Falha ao iniciar o componente MySQLi.");
+}
+
+if (!$conexao_sucesso) {
+  echo "Não foi possível conectar ao banco de dados. Erro: " . mysqli_connect_error();
 } else {
-    echo "Conectado com sucesso ao banco de dados!";
+  echo "Conectado com sucesso ao banco de dados!";
 }
 ?>
