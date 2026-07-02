@@ -11,8 +11,6 @@ $mysqli = mysqli_init();
 if (!$mysqli) {
     die("Falha ao iniciar o componente MySQLi.");
 }
-
-// ESSA É A LINHA QUE FALTAVA PARA FAZER A CONEXÃO REALMENTE ACONTECER:
 $conexao_sucesso = mysqli_real_connect($mysqli, $host, $usuario, $senha, $banco, $porta);
 
 if (!$conexao_sucesso) {
