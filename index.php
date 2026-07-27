@@ -1,15 +1,16 @@
 <?php
-echo "<h1>Se você está lendo isso, o seu servidor PHP está 100% funcionando na nuvem!</h1>";
-echo "<p>Para testar a conexão com o banco de dados, acesse o link adicionando /conexao.php no final da URL.</P>";
-?>
-<?php
 
-header('Content-Type: text/plain');
+require_once __DIR__ . '/config/database.php';
 
-echo "PHP funcionando!\n";
-echo "PHP_VERSION = " . PHP_VERSION . "\n";
-echo "PWD = " . getcwd() . "\n";
-echo "FILES:\n";
+try {
+    $stmt = $pdo->query("SELECT 1 AS ok");
+    $linha = $stmt->fetch();
 
-print_r(scandir('.'));
-print_r(scandir('.'));
+    echo "<h1>Conexão com o banco OK</h1>";
+    echo "<p>Resultado: " . $linha['ok'] . "</p>";
+    echo "<p>PHP funcionando na Railway.</p>";
+
+} catch (Throwable $e) {
+    echo "<h1>Erro no teste</h1>";
+    echo "<pre>" . $e->getMessage() . "</pre>";
+}
