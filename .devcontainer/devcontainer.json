@@ -1,0 +1,11 @@
+{
+  "name": "Sistema de Calibração PHP",
+
+  "dockerComposeFile": "docker-compose.yml",
+
+  "service": "app",
+
+  "workspaceFolder": "/workspaces/sistema-calibracao",
+
+  "forwardPorts": [8000, 3306]
+}
