@@ -1,22 +1,29 @@
 <?php
 
-$hoje = new DateTime('today');
+$equipamentos = $equipamentos ?? [];
+
+$sucessoEquipamento =
+    $sucessoEquipamento ?? null;
+
+$erroEquipamento =
+    $erroEquipamento ?? null;
 
 ?>
 
 <div class="container-fluid">
 
+
     <!-- ====================================================== -->
     <!-- MENSAGENS -->
     <!-- ====================================================== -->
 
-    <?php if (!empty($sucessoCalibracao)): ?>
+    <?php if ($sucessoEquipamento): ?>
 
         <div class="alert alert-success alert-dismissible fade show">
 
             <i class="bi bi-check-circle"></i>
 
-            <?= htmlspecialchars($sucessoCalibracao) ?>
+            <?= htmlspecialchars($sucessoEquipamento) ?>
 
             <button
                 type="button"
@@ -29,13 +36,13 @@ $hoje = new DateTime('today');
     <?php endif; ?>
 
 
-    <?php if (!empty($erroCalibracao)): ?>
+    <?php if ($erroEquipamento): ?>
 
         <div class="alert alert-danger alert-dismissible fade show">
 
             <i class="bi bi-exclamation-triangle"></i>
 
-            <?= htmlspecialchars($erroCalibracao) ?>
+            <?= htmlspecialchars($erroEquipamento) ?>
 
             <button
                 type="button"
@@ -58,158 +65,39 @@ $hoje = new DateTime('today');
 
             <h2 class="mb-1">
 
-                <i class="bi bi-clipboard2-check"></i>
+                <i class="bi bi-hdd-stack"></i>
 
-                Calibrações
+                Equipamentos
 
             </h2>
 
             <p class="text-muted mb-0">
 
-                Gerenciamento das calibrações dos equipamentos.
+                Gerenciamento dos equipamentos cadastrados.
 
             </p>
 
         </div>
 
 
-        <div>
+        <!-- NOVO EQUIPAMENTO -->
 
-            <a
-                href="calibracoes.php?acao=novo"
-                class="btn btn-primary"
-            >
+        <a
+            href="equipamentos.php?acao=novo"
+            class="btn btn-primary"
+        >
 
-                <i class="bi bi-plus-circle"></i>
+            <i class="bi bi-plus-circle"></i>
 
-                Nova Calibração
+            Novo Equipamento
 
-            </a>
-
-        </div>
+        </a>
 
     </div>
 
 
     <!-- ====================================================== -->
-    <!-- INDICADORES -->
-    <!-- ====================================================== -->
-
-    <div class="row g-3 mb-4">
-
-
-        <!-- TOTAL -->
-
-        <div class="col-md-3">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-body">
-
-                    <div class="text-muted mb-1">
-
-                        Total de Calibrações
-
-                    </div>
-
-                    <h2 class="mb-0">
-
-                        <?= $totalCalibracoes ?>
-
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- APROVADAS -->
-
-        <div class="col-md-3">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-body">
-
-                    <div class="text-muted mb-1">
-
-                        Aprovadas
-
-                    </div>
-
-                    <h2 class="mb-0 text-success">
-
-                        <?= $totalAprovadas ?>
-
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- COM RESTRIÇÃO -->
-
-        <div class="col-md-3">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-body">
-
-                    <div class="text-muted mb-1">
-
-                        Com Restrição
-
-                    </div>
-
-                    <h2 class="mb-0 text-warning">
-
-                        <?= $totalRestricoes ?>
-
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- VENCIDAS -->
-
-        <div class="col-md-3">
-
-            <div class="card shadow-sm border-0 h-100">
-
-                <div class="card-body">
-
-                    <div class="text-muted mb-1">
-
-                        Vencidas
-
-                    </div>
-
-                    <h2 class="mb-0 text-danger">
-
-                        <?= $totalVencidas ?>
-
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ====================================================== -->
-    <!-- FILTROS -->
+    <!-- FILTRO / PESQUISA -->
     <!-- ====================================================== -->
 
     <div class="card shadow-sm border-0 mb-4">
@@ -218,10 +106,7 @@ $hoje = new DateTime('today');
 
             <div class="row g-3">
 
-
-                <!-- PESQUISA -->
-
-                <div class="col-md-5">
+                <div class="col-md-8">
 
                     <label class="form-label">
 
@@ -231,57 +116,19 @@ $hoje = new DateTime('today');
 
                     <input
                         type="text"
-                        id="pesquisaCalibracao"
+                        id="pesquisaEquipamento"
                         class="form-control"
-                        placeholder="Equipamento, patrimônio ou certificado..."
+                        placeholder="Nome, patrimônio, TAG, modelo ou número de série..."
                     >
 
                 </div>
 
-
-                <!-- RESULTADO -->
-
-                <div class="col-md-3">
-
-                    <label class="form-label">
-
-                        Resultado
-
-                    </label>
-
-                    <select
-                        id="filtroResultado"
-                        class="form-select"
-                    >
-
-                        <option value="">
-                            Todos
-                        </option>
-
-                        <option value="Aprovado">
-                            Aprovado
-                        </option>
-
-                        <option value="Aprovado com Restrição">
-                            Aprovado com Restrição
-                        </option>
-
-                        <option value="Reprovado">
-                            Reprovado
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- LIMPAR -->
 
                 <div class="col-md-2 d-flex align-items-end">
 
                     <button
                         type="button"
-                        id="limparFiltros"
+                        id="limparPesquisa"
                         class="btn btn-outline-secondary w-100"
                     >
 
@@ -294,15 +141,13 @@ $hoje = new DateTime('today');
                 </div>
 
 
-                <!-- REPROVADAS -->
-
                 <div class="col-md-2 d-flex align-items-end">
 
                     <div class="text-muted small">
 
-                        <?= $totalReprovadas ?>
+                        <?= count($equipamentos) ?>
 
-                        reprovada(s)
+                        equipamento(s)
 
                     </div>
 
@@ -340,34 +185,26 @@ $hoje = new DateTime('today');
                             </th>
 
                             <th>
-                                Certificado
+                                TAG
                             </th>
 
                             <th>
-                                Laboratório
+                                Tipo
                             </th>
 
                             <th>
-                                Data
+                                Setor
                             </th>
 
                             <th>
-                                Validade
-                            </th>
-
-                            <th>
-                                Resultado
+                                Status
                             </th>
 
                             <th>
                                 Situação
                             </th>
 
-                            <th>
-                                Certificado PDF
-                            </th>
-
-                            <th>
+                            <th class="text-end">
                                 Ações
                             </th>
 
@@ -376,23 +213,23 @@ $hoje = new DateTime('today');
                     </thead>
 
 
-                    <tbody id="tabelaCalibracoes">
+                    <tbody id="tabelaEquipamentos">
 
 
-                        <?php if (empty($calibracoes)): ?>
+                        <?php if (empty($equipamentos)): ?>
 
-                            <tr>
+                            <tr id="semEquipamentos">
 
                                 <td
-                                    colspan="10"
+                                    colspan="8"
                                     class="text-center text-muted py-5"
                                 >
 
                                     <i
-                                        class="bi bi-clipboard-x fs-1 d-block mb-3"
+                                        class="bi bi-hdd-stack fs-1 d-block mb-3"
                                     ></i>
 
-                                    Nenhuma calibração cadastrada.
+                                    Nenhum equipamento cadastrado.
 
                                 </td>
 
@@ -402,82 +239,24 @@ $hoje = new DateTime('today');
                         <?php else: ?>
 
 
-                            <?php foreach ($calibracoes as $calibracao): ?>
-
+                            <?php foreach (
+                                $equipamentos
+                                as $equipamento
+                            ): ?>
 
                                 <?php
 
-                                // ------------------------------------------------
-                                // RESULTADO
-                                // ------------------------------------------------
-
-                                $resultado =
-                                    $calibracao['resultado'] ?? '';
-
-                                $classeResultado = 'secondary';
-
-
-                                if (
-                                    $resultado === 'Aprovado'
-                                ) {
-
-                                    $classeResultado = 'success';
-
-                                } elseif (
-                                    $resultado ===
-                                    'Aprovado com Restrição'
-                                ) {
-
-                                    $classeResultado = 'warning';
-
-                                } elseif (
-                                    $resultado === 'Reprovado'
-                                ) {
-
-                                    $classeResultado = 'danger';
-
-                                }
-
-
-                                // ------------------------------------------------
-                                // VALIDADE
-                                // ------------------------------------------------
-
-                                $vencida = false;
-
-
-                                if (
-                                    !empty(
-                                        $calibracao['data_validade']
-                                    )
-                                ) {
-
-                                    $validade =
-                                        DateTime::createFromFormat(
-                                            'Y-m-d',
-                                            $calibracao['data_validade']
-                                        );
-
-
-                                    if (
-                                        $validade &&
-                                        $validade < $hoje
-                                    ) {
-
-                                        $vencida = true;
-
-                                    }
-
-                                }
+                                $ativo =
+                                    (int) (
+                                        $equipamento['ativo']
+                                        ?? 1
+                                    ) === 1;
 
                                 ?>
 
 
                                 <tr
-                                    class="linha-calibracao"
-                                    data-resultado="<?= htmlspecialchars(
-                                        $resultado
-                                    ) ?>"
+                                    class="linha-equipamento"
                                 >
 
 
@@ -488,7 +267,7 @@ $hoje = new DateTime('today');
                                         <strong>
 
                                             <?= htmlspecialchars(
-                                                $calibracao['equipamento']
+                                                $equipamento['nome']
                                                 ?? '-'
                                             ) ?>
 
@@ -497,7 +276,7 @@ $hoje = new DateTime('today');
 
                                         <?php if (
                                             !empty(
-                                                $calibracao['tag']
+                                                $equipamento['modelo']
                                             )
                                         ): ?>
 
@@ -505,10 +284,31 @@ $hoje = new DateTime('today');
 
                                             <small class="text-muted">
 
-                                                TAG:
+                                                Modelo:
 
                                                 <?= htmlspecialchars(
-                                                    $calibracao['tag']
+                                                    $equipamento['modelo']
+                                                ) ?>
+
+                                            </small>
+
+                                        <?php endif; ?>
+
+
+                                        <?php if (
+                                            !empty(
+                                                $equipamento['numero_serie']
+                                            )
+                                        ): ?>
+
+                                            <br>
+
+                                            <small class="text-muted">
+
+                                                Série:
+
+                                                <?= htmlspecialchars(
+                                                    $equipamento['numero_serie']
                                                 ) ?>
 
                                             </small>
@@ -523,85 +323,105 @@ $hoje = new DateTime('today');
                                     <td>
 
                                         <?= htmlspecialchars(
-                                            $calibracao['patrimonio']
+                                            $equipamento['patrimonio']
                                             ?? '-'
                                         ) ?>
 
                                     </td>
 
 
-                                    <!-- NÚMERO CERTIFICADO -->
+                                    <!-- TAG -->
 
                                     <td>
 
                                         <?= htmlspecialchars(
-                                            $calibracao['numero_certificado']
+                                            $equipamento['tag']
                                             ?? '-'
                                         ) ?>
 
                                     </td>
 
 
-                                    <!-- LABORATÓRIO -->
+                                    <!-- TIPO -->
 
                                     <td>
 
                                         <?= htmlspecialchars(
-                                            $calibracao['laboratorio']
+                                            $equipamento['tipo']
                                             ?? '-'
                                         ) ?>
 
                                     </td>
 
 
-                                    <!-- DATA -->
+                                    <!-- SETOR -->
 
                                     <td>
 
-                                        <?= !empty(
-                                            $calibracao['data_calibracao']
-                                        )
-                                            ? date(
-                                                'd/m/Y',
-                                                strtotime(
-                                                    $calibracao['data_calibracao']
-                                                )
-                                            )
-                                            : '-'
-                                        ?>
+                                        <?= htmlspecialchars(
+                                            $equipamento['setor']
+                                            ?? '-'
+                                        ) ?>
 
                                     </td>
 
 
-                                    <!-- VALIDADE -->
+                                    <!-- STATUS -->
 
                                     <td>
 
-                                        <?= !empty(
-                                            $calibracao['data_validade']
-                                        )
-                                            ? date(
-                                                'd/m/Y',
-                                                strtotime(
-                                                    $calibracao['data_validade']
-                                                )
+                                        <?php
+
+                                        $statusNome =
+                                            $equipamento['status']
+                                            ?? '-';
+
+                                        $statusClasse =
+                                            'secondary';
+
+
+                                        if (
+                                            mb_strtolower(
+                                                $statusNome
                                             )
-                                            : '-'
+                                            ===
+                                            'ativo'
+                                        ) {
+
+                                            $statusClasse =
+                                                'success';
+
+                                        } elseif (
+                                            stripos(
+                                                $statusNome,
+                                                'manutenção'
+                                            ) !== false
+                                        ) {
+
+                                            $statusClasse =
+                                                'warning';
+
+                                        } elseif (
+                                            stripos(
+                                                $statusNome,
+                                                'calibração'
+                                            ) !== false
+                                        ) {
+
+                                            $statusClasse =
+                                                'primary';
+
+                                        }
+
                                         ?>
 
-                                    </td>
-
-
-                                    <!-- RESULTADO -->
-
-                                    <td>
 
                                         <span
-                                            class="badge text-bg-<?= $classeResultado ?>"
+                                            class="badge text-bg-<?= $statusClasse ?>"
                                         >
 
                                             <?= htmlspecialchars(
-                                                $resultado
+                                                $statusNome
                                             ) ?>
 
                                         </span>
@@ -613,65 +433,32 @@ $hoje = new DateTime('today');
 
                                     <td>
 
-                                        <?php if ($vencida): ?>
-
-                                            <span
-                                                class="badge text-bg-danger"
-                                            >
-
-                                                <i class="bi bi-exclamation-triangle"></i>
-
-                                                Vencida
-
-                                            </span>
-
-                                        <?php else: ?>
+                                        <?php if ($ativo): ?>
 
                                             <span
                                                 class="badge text-bg-success"
                                             >
 
-                                                <i class="bi bi-check-circle"></i>
+                                                <i
+                                                    class="bi bi-check-circle"
+                                                ></i>
 
-                                                Dentro da validade
+                                                Ativo
 
                                             </span>
 
-                                        <?php endif; ?>
+                                        <?php else: ?>
 
-                                    </td>
-
-
-                                    <!-- PDF -->
-
-                                    <td>
-
-                                        <?php if (
-                                            !empty(
-                                                $calibracao['certificado_pdf']
-                                            )
-                                        ): ?>
-
-                                            <a
-                                                href="<?= htmlspecialchars(
-                                                    $calibracao['certificado_pdf']
-                                                ) ?>"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="btn btn-sm btn-outline-danger"
-                                                title="Visualizar certificado PDF"
+                                            <span
+                                                class="badge text-bg-secondary"
                                             >
 
                                                 <i
-                                                    class="bi bi-file-earmark-pdf"
+                                                    class="bi bi-pause-circle"
                                                 ></i>
 
-                                            </a>
+                                                Inativo
 
-                                        <?php else: ?>
-
-                                            <span class="text-muted">
-                                                —
                                             </span>
 
                                         <?php endif; ?>
@@ -681,26 +468,34 @@ $hoje = new DateTime('today');
 
                                     <!-- AÇÕES -->
 
-                                    <td>
+                                    <td class="text-end">
+
+                                        <div
+                                            class="d-flex justify-content-end gap-1"
+                                        >
 
 
-                                    <a
-    href="calibracoes.php?acao=editar&id=<?= (int) $calibracao['id'] ?>"
-    class="btn btn-sm btn-outline-warning"
-    title="Editar calibração"
->
-    <i class="bi bi-pencil"></i>
-</a>
+                                            <!-- EDITAR -->
 
-                                        <div class="d-flex gap-1">
+                                            <a
+                                                href="equipamentos.php?acao=editar&id=<?= (int) $equipamento['id'] ?>"
+                                                class="btn btn-sm btn-outline-warning"
+                                                title="Editar equipamento"
+                                            >
+
+                                                <i
+                                                    class="bi bi-pencil"
+                                                ></i>
+
+                                            </a>
 
 
                                             <!-- VISUALIZAR -->
 
                                             <a
-                                                href="calibracoes.php?acao=visualizar&id=<?= (int) $calibracao['id'] ?>"
+                                                href="equipamentos.php?acao=visualizar&id=<?= (int) $equipamento['id'] ?>"
                                                 class="btn btn-sm btn-outline-primary"
-                                                title="Visualizar calibração"
+                                                title="Visualizar equipamento"
                                             >
 
                                                 <i
@@ -710,31 +505,58 @@ $hoje = new DateTime('today');
                                             </a>
 
 
-                                            <!-- PDF -->
+                                            <!-- ATIVAR / INATIVAR -->
 
-                                            <?php if (
-                                                !empty(
-                                                    $calibracao['certificado_pdf']
-                                                )
-                                            ): ?>
+                                            <form
+                                                method="POST"
+                                                action="equipamentos.php"
+                                                class="d-inline"
+                                            >
 
-                                                <a
-                                                    href="<?= htmlspecialchars(
-                                                        $calibracao['certificado_pdf']
-                                                    ) ?>"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    class="btn btn-sm btn-outline-danger"
-                                                    title="Abrir certificado PDF"
+                                                <input
+                                                    type="hidden"
+                                                    name="acao"
+                                                    value="alternar_ativo"
+                                                >
+
+
+                                                <input
+                                                    type="hidden"
+                                                    name="id"
+                                                    value="<?= (int) $equipamento['id'] ?>"
+                                                >
+
+
+                                                <input
+                                                    type="hidden"
+                                                    name="ativo"
+                                                    value="<?= $ativo ? 0 : 1 ?>"
+                                                >
+
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm <?= $ativo
+                                                        ? 'btn-outline-danger'
+                                                        : 'btn-outline-success'
+                                                    ?>"
+                                                    title="<?= $ativo
+                                                        ? 'Inativar equipamento'
+                                                        : 'Ativar equipamento'
+                                                    ?>"
+                                                    onclick="return confirm('Deseja realmente <?= $ativo ? 'inativar' : 'ativar' ?> este equipamento?');"
                                                 >
 
                                                     <i
-                                                        class="bi bi-file-earmark-pdf"
+                                                        class="bi <?= $ativo
+                                                            ? 'bi-pause-circle'
+                                                            : 'bi-play-circle'
+                                                        ?>"
                                                     ></i>
 
-                                                </a>
+                                                </button>
 
-                                            <?php endif; ?>
+                                            </form>
 
 
                                         </div>
@@ -764,7 +586,7 @@ $hoje = new DateTime('today');
 
 
 <!-- ========================================================== -->
-<!-- FILTROS DA TABELA -->
+<!-- PESQUISA -->
 <!-- ========================================================== -->
 
 <script>
@@ -775,22 +597,17 @@ document.addEventListener(
 
         const pesquisa =
             document.getElementById(
-                'pesquisaCalibracao'
-            );
-
-        const filtroResultado =
-            document.getElementById(
-                'filtroResultado'
+                'pesquisaEquipamento'
             );
 
         const limpar =
             document.getElementById(
-                'limparFiltros'
+                'limparPesquisa'
             );
 
         const linhas =
             document.querySelectorAll(
-                '.linha-calibracao'
+                '.linha-equipamento'
             );
 
 
@@ -801,9 +618,6 @@ document.addEventListener(
                     .toLowerCase()
                     .trim();
 
-            const resultado =
-                filtroResultado.value;
-
 
             linhas.forEach(
                 function (linha) {
@@ -813,37 +627,14 @@ document.addEventListener(
                             .toLowerCase();
 
 
-                    const resultadoLinha =
-                        linha.dataset.resultado;
-
-
-                    const correspondeTexto =
-                        texto === ''
-                        ||
-                        conteudo.includes(
-                            texto
-                        );
-
-
-                    const correspondeResultado =
-                        resultado === ''
-                        ||
-                        resultadoLinha === resultado;
-
-
-                    if (
-                        correspondeTexto
-                        &&
-                        correspondeResultado
-                    ) {
-
-                        linha.style.display = '';
-
-                    } else {
-
-                        linha.style.display = 'none';
-
-                    }
+                    linha.style.display =
+                        (
+                            texto === ''
+                            ||
+                            conteudo.includes(texto)
+                        )
+                            ? ''
+                            : 'none';
 
                 }
             );
@@ -857,19 +648,11 @@ document.addEventListener(
         );
 
 
-        filtroResultado.addEventListener(
-            'change',
-            filtrar
-        );
-
-
         limpar.addEventListener(
             'click',
             function () {
 
                 pesquisa.value = '';
-
-                filtroResultado.value = '';
 
                 filtrar();
 

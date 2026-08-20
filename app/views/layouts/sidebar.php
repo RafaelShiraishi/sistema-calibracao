@@ -12,58 +12,143 @@ $paginaAtual = basename($_SERVER['PHP_SELF']);
         Sistema de Calibração
     </h4>
 
+
+    <!-- ====================================================== -->
+    <!-- DASHBOARD -->
+    <!-- ====================================================== -->
+
     <a
         href="dashboard.php"
         class="<?= $paginaAtual === 'dashboard.php' ? 'active' : '' ?>"
     >
+
         <i class="bi bi-speedometer2"></i>
+
         Dashboard
+
     </a>
+
+
+    <!-- ====================================================== -->
+    <!-- EQUIPAMENTOS -->
+    <!-- ====================================================== -->
 
     <a
         href="equipamentos.php"
         class="<?= $paginaAtual === 'equipamentos.php' ? 'active' : '' ?>"
     >
+
         <i class="bi bi-hdd-stack"></i>
+
         Equipamentos
+
     </a>
 
-    <a href="calibracoes.php">
+
+    <!-- ====================================================== -->
+    <!-- CALIBRAÇÕES -->
+    <!-- ====================================================== -->
+
+    <a
+        href="calibracoes.php"
+        class="<?= $paginaAtual === 'calibracoes.php' ? 'active' : '' ?>"
+    >
+
         <i class="bi bi-clipboard2-check"></i>
+
         Calibrações
+
     </a>
 
-    <a href="laboratorios.php">
+
+    <!-- ====================================================== -->
+    <!-- LABORATÓRIOS -->
+    <!-- ====================================================== -->
+
+    <a
+        href="laboratorios.php"
+        class="<?= $paginaAtual === 'laboratorios.php' ? 'active' : '' ?>"
+    >
+
         <i class="bi bi-building"></i>
+
         Laboratórios
+
     </a>
 
-    <a href="usuarios.php">
+
+    <!-- ====================================================== -->
+    <!-- USUÁRIOS -->
+    <!-- ====================================================== -->
+
+    <a
+        href="usuarios.php"
+        class="<?= $paginaAtual === 'usuarios.php' ? 'active' : '' ?>"
+    >
+
         <i class="bi bi-people"></i>
+
         Usuários
+
     </a>
 
-    <a href="relatorios.php">
+
+    <!-- ====================================================== -->
+    <!-- RELATÓRIOS -->
+    <!-- ====================================================== -->
+
+    <a
+        href="relatorios.php"
+        class="<?= $paginaAtual === 'relatorios.php' ? 'active' : '' ?>"
+    >
+
         <i class="bi bi-file-earmark-bar-graph"></i>
+
         Relatórios
+
     </a>
 
-    <a href="configuracoes.php">
+
+    <!-- ====================================================== -->
+    <!-- CONFIGURAÇÕES -->
+    <!-- ====================================================== -->
+
+    <a
+        href="configuracoes.php"
+        class="<?= $paginaAtual === 'configuracoes.php' ? 'active' : '' ?>"
+    >
+
         <i class="bi bi-gear"></i>
+
         Configurações
+
     </a>
+
 
     <hr class="text-light">
 
+
+    <!-- ====================================================== -->
+    <!-- SAIR -->
+    <!-- ====================================================== -->
+
     <a href="logout.php">
+
         <i class="bi bi-box-arrow-right"></i>
+
         Sair
+
     </a>
 
 </div>
 
 
 <div class="content">
+
+
+    <!-- ====================================================== -->
+    <!-- TOPBAR -->
+    <!-- ====================================================== -->
 
     <div class="topbar d-flex justify-content-between align-items-center">
 
@@ -79,12 +164,18 @@ $paginaAtual = basename($_SERVER['PHP_SELF']);
 
         </div>
 
+
         <div>
 
             <i class="bi bi-person-circle fs-4"></i>
 
             <strong class="ms-2">
-                <?= htmlspecialchars($_SESSION['usuario']['nome'] ?? 'Usuário') ?>
+
+                <?= htmlspecialchars(
+                    $_SESSION['usuario']['nome']
+                    ?? 'Usuário'
+                ) ?>
+
             </strong>
 
         </div>

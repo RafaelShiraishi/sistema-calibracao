@@ -4,6 +4,11 @@ class Equipamento
 {
     private PDO $pdo;
 
+
+    // ============================================================
+    // CONSTRUTOR
+    // ============================================================
+
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -94,6 +99,8 @@ class Equipamento
                 ON emp.id = e.empresa_id
 
             WHERE e.id = :id
+
+            LIMIT 1
         ";
 
         $stmt = $this->pdo->prepare($sql);
@@ -116,7 +123,9 @@ class Equipamento
     // BUSCAR ÚLTIMA CALIBRAÇÃO
     // ============================================================
 
-    public function buscarUltimaCalibracao(int $equipamentoId): ?array
+    public function buscarUltimaCalibracao(
+        int $equipamentoId
+    ): ?array
     {
         $sql = "
             SELECT
@@ -164,7 +173,9 @@ class Equipamento
     // LISTAR CALIBRAÇÕES DO EQUIPAMENTO
     // ============================================================
 
-    public function listarCalibracoes(int $equipamentoId): array
+    public function listarCalibracoes(
+        int $equipamentoId
+    ): array
     {
         $sql = "
             SELECT
@@ -198,6 +209,63 @@ class Equipamento
 
         $stmt->execute([
             ':equipamento_id' => $equipamentoId
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    // ============================================================
+    // LISTAR HISTÓRICO DO EQUIPAMENTO
+    // ============================================================
+
+    public function listarHistorico(
+        int $equipamentoId
+    ): array
+    {
+        $sql = "
+            SELECT
+                c.data_calibracao AS data_evento,
+                'Calibração' AS tipo_evento,
+                c.numero_certificado AS descricao,
+                c.observacoes,
+                u.nome AS usuario
+
+            FROM calibracoes c
+
+            LEFT JOIN usuarios u
+                ON u.id = c.usuario_id
+
+            WHERE c.equipamento_id = :equipamento_calibracao
+
+            UNION ALL
+
+            SELECT
+                m.data_manutencao AS data_evento,
+                'Manutenção' AS tipo_evento,
+                m.descricao AS descricao,
+                m.observacoes,
+                u.nome AS usuario
+
+            FROM manutencoes m
+
+            LEFT JOIN usuarios u
+                ON u.id = m.usuario_id
+
+            WHERE m.equipamento_id = :equipamento_manutencao
+
+            ORDER BY
+                data_evento DESC
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            ':equipamento_calibracao' =>
+                $equipamentoId,
+
+            ':equipamento_manutencao' =>
+                $equipamentoId
         ]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -264,7 +332,10 @@ class Equipamento
     // ATUALIZAR EQUIPAMENTO
     // ============================================================
 
-    public function atualizar(int $id, array $dados): bool
+    public function atualizar(
+        int $id,
+        array $dados
+    ): bool
     {
         $sql = "
             UPDATE equipamentos
@@ -427,5 +498,120 @@ class Equipamento
                 ORDER BY nome
             ")
             ->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    // ============================================================
+    // VERIFICAR PATRIMÔNIO DUPLICADO
+    // ============================================================
+
+    public function existePatrimonio(
+        string $patrimonio,
+        ?int $ignorarId = null
+    ): bool
+    {
+        $sql = "
+            SELECT id
+            FROM equipamentos
+            WHERE LOWER(TRIM(patrimonio))
+                = LOWER(TRIM(:patrimonio))
+        ";
+
+        if ($ignorarId !== null) {
+
+            $sql .= "
+                AND id <> :id
+            ";
+        }
+
+        $sql .= "
+            LIMIT 1
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $params = [
+            ':patrimonio' => $patrimonio
+        ];
+
+        if ($ignorarId !== null) {
+
+            $params[':id'] = $ignorarId;
+        }
+
+        $stmt->execute($params);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+
+    // ============================================================
+    // VERIFICAR TAG DUPLICADA
+    // ============================================================
+
+    public function existeTag(
+        string $tag,
+        ?int $ignorarId = null
+    ): bool
+    {
+        if (trim($tag) === '') {
+
+            return false;
+        }
+
+        $sql = "
+            SELECT id
+            FROM equipamentos
+            WHERE LOWER(TRIM(tag))
+                = LOWER(TRIM(:tag))
+        ";
+
+        if ($ignorarId !== null) {
+
+            $sql .= "
+                AND id <> :id
+            ";
+        }
+
+        $sql .= "
+            LIMIT 1
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $params = [
+            ':tag' => $tag
+        ];
+
+        if ($ignorarId !== null) {
+
+            $params[':id'] = $ignorarId;
+        }
+
+        $stmt->execute($params);
+
+        return (bool) $stmt->fetchColumn();
+    }
+
+
+    // ============================================================
+    // ATIVAR / INATIVAR EQUIPAMENTO
+    // ============================================================
+
+    public function alterarAtivo(
+        int $id,
+        bool $ativo
+    ): bool
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE equipamentos
+            SET ativo = :ativo
+            WHERE id = :id
+        ");
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':ativo' => $ativo ? 1 : 0
+        ]);
     }
 }

@@ -264,8 +264,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
 
-            // Limite de 10 MB
-
             $tamanhoMaximo =
                 10 * 1024 * 1024;
 
@@ -285,8 +283,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-
-            // Extensão
 
             $extensao =
                 strtolower(
@@ -309,8 +305,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-
-            // MIME
 
             $finfo = new finfo(
                 FILEINFO_MIME_TYPE
@@ -652,7 +646,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // STATUS AUTOMÁTICO
         // ----------------------------------------------------
 
-        $hoje = new DateTime('today');
+        $hoje =
+            new DateTime('today');
 
         $statusId =
             $dataValidadeObj < $hoje
@@ -732,9 +727,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
 
-            $finfo = new finfo(
-                FILEINFO_MIME_TYPE
-            );
+            $finfo =
+                new finfo(FILEINFO_MIME_TYPE);
+
 
             $mime =
                 $finfo->file(
@@ -867,7 +862,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
 
-            $controller->salvar($dados);
+            $controller->salvar(
+                $dados
+            );
 
             $_SESSION['sucesso_calibracao'] =
                 'Calibração cadastrada com sucesso.';
@@ -904,6 +901,7 @@ if ($acao === 'visualizar') {
         'id',
         FILTER_VALIDATE_INT
     );
+
 
     if (!$id) {
 
@@ -952,6 +950,7 @@ if ($acao === 'editar') {
         'id',
         FILTER_VALIDATE_INT
     );
+
 
     if (!$id) {
 
@@ -1007,6 +1006,19 @@ if ($acao === 'editar') {
 // ============================================================
 
 if ($acao === 'novo') {
+
+    $equipamentoSelecionado =
+        filter_input(
+            INPUT_GET,
+            'equipamento_id',
+            FILTER_VALIDATE_INT
+        );
+
+    if (!$equipamentoSelecionado) {
+
+        $equipamentoSelecionado = null;
+    }
+
 
     $equipamentos =
         $controller->equipamentos();
@@ -1073,7 +1085,8 @@ foreach ($calibracoes as $calibracao) {
         $totalAprovadas++;
 
     } elseif (
-        $resultado === 'Aprovado com Restrição'
+        $resultado ===
+        'Aprovado com Restrição'
     ) {
 
         $totalRestricoes++;

@@ -20,7 +20,7 @@ $acao = $_GET['acao'] ?? 'listar';
 
 
 // ============================================================
-// SALVAR MANUTENÇÃO
+// POST - MANUTENÇÃO
 // ============================================================
 
 if (
@@ -31,35 +31,73 @@ if (
     $equipamentoId = (int) ($_POST['equipamento_id'] ?? 0);
 
     if ($equipamentoId <= 0) {
-        die('Equipamento inválido.');
+
+        $_SESSION['erro_equipamento'] =
+            'Equipamento inválido.';
+
+        header("Location: equipamentos.php");
+
+        exit;
     }
+
 
     $dadosManutencao = [
 
-        ':equipamento_id' => $equipamentoId,
+        ':equipamento_id' =>
+            $equipamentoId,
 
-        ':usuario_id' => (int) $_SESSION['usuario']['id'],
+        ':usuario_id' =>
+            (int) $_SESSION['usuario']['id'],
 
-        ':descricao' => trim(
-            $_POST['descricao_manutencao'] ?? ''
-        ),
+        ':descricao' =>
+            trim(
+                $_POST['descricao_manutencao'] ?? ''
+            ),
 
-        ':data_manutencao' => $_POST['data_manutencao'] ?? '',
+        ':data_manutencao' =>
+            $_POST['data_manutencao'] ?? '',
 
-        ':observacoes' => trim(
-            $_POST['observacoes_manutencao'] ?? ''
-        )
+        ':observacoes' =>
+            trim(
+                $_POST['observacoes_manutencao'] ?? ''
+            )
 
     ];
 
+
     if (
         empty($dadosManutencao[':descricao'])
-        || empty($dadosManutencao[':data_manutencao'])
+        ||
+        empty($dadosManutencao[':data_manutencao'])
     ) {
-        die('Descrição e data da manutenção são obrigatórias.');
+
+        $_SESSION['erro_equipamento'] =
+            'Descrição e data da manutenção são obrigatórias.';
+
+        header(
+            'Location: equipamentos.php?acao=editar&id='
+            . $equipamentoId
+        );
+
+        exit;
     }
 
-    $manutencaoController->salvar($dadosManutencao);
+
+    try {
+
+        $manutencaoController->salvar(
+            $dadosManutencao
+        );
+
+        $_SESSION['sucesso_equipamento'] =
+            'Manutenção registrada com sucesso.';
+
+    } catch (Throwable $e) {
+
+        $_SESSION['erro_equipamento'] =
+            'Não foi possível registrar a manutenção.';
+    }
+
 
     header(
         'Location: equipamentos.php?acao=editar&id='
@@ -71,116 +109,348 @@ if (
 
 
 // ============================================================
-// SALVAR / ATUALIZAR EQUIPAMENTO
+// POST - ATIVAR / INATIVAR
 // ============================================================
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && ($_POST['acao'] ?? '') === 'alternar_ativo'
+) {
 
-    $dados = [
+    $equipamentoId =
+        (int) ($_POST['id'] ?? 0);
 
-        ':empresa' => !empty($_POST['empresa'])
-            ? (int) $_POST['empresa']
-            : null,
-
-        ':fabricante' => !empty($_POST['fabricante'])
-            ? (int) $_POST['fabricante']
-            : null,
-
-        ':setor' => !empty($_POST['setor'])
-            ? (int) $_POST['setor']
-            : null,
-
-        ':responsavel' => !empty($_POST['responsavel'])
-            ? (int) $_POST['responsavel']
-            : null,
-
-        ':status' => !empty($_POST['status'])
-            ? (int) $_POST['status']
-            : 1,
-
-        ':tipo' => !empty($_POST['tipo'])
-            ? (int) $_POST['tipo']
-            : null,
-
-        ':patrimonio' => trim(
-            $_POST['patrimonio'] ?? ''
-        ),
-
-        ':tag' => trim(
-            $_POST['tag'] ?? ''
-        ),
-
-        ':nome' => trim(
-            $_POST['nome'] ?? ''
-        ),
-
-        ':modelo' => trim(
-            $_POST['modelo'] ?? ''
-        ),
-
-        ':serie' => trim(
-            $_POST['serie'] ?? ''
-        ),
-
-        ':faixa' => trim(
-            $_POST['faixa'] ?? ''
-        ),
-
-        ':resolucao' => trim(
-            $_POST['resolucao'] ?? ''
-        ),
-
-        ':localizacao' => trim(
-            $_POST['localizacao'] ?? ''
-        ),
-
-        ':data' => !empty($_POST['data'])
-            ? $_POST['data']
-            : null,
-
-        ':obs' => trim(
-            $_POST['observacoes']
-            ?? $_POST['obs']
-            ?? ''
-        )
-
-    ];
+    $ativo =
+        (int) ($_POST['ativo'] ?? 0);
 
 
-    // --------------------------------------------------------
-    // SE EXISTIR ID, ATUALIZA
-    // --------------------------------------------------------
+    if ($equipamentoId <= 0) {
 
-    if (!empty($_POST['id'])) {
-
-        $id = (int) $_POST['id'];
-
-        $controller->atualizar(
-            $id,
-            $dados
-        );
+        $_SESSION['erro_equipamento'] =
+            'Equipamento inválido.';
 
         header(
-            "Location: equipamentos.php?acao=editar&id="
-            . $id
+            'Location: equipamentos.php'
         );
 
         exit;
     }
 
 
-    // --------------------------------------------------------
-    // CASO CONTRÁRIO, CADASTRA NOVO
-    // --------------------------------------------------------
+    try {
 
-    $controller->salvar($dados);
+        $controller->alterarAtivo(
+            $equipamentoId,
+            $ativo === 1
+        );
+
+        $_SESSION['sucesso_equipamento'] =
+            $ativo === 1
+                ? 'Equipamento ativado com sucesso.'
+                : 'Equipamento inativado com sucesso.';
+
+    } catch (Throwable $e) {
+
+        $_SESSION['erro_equipamento'] =
+            'Não foi possível alterar o status do equipamento.';
+    }
+
 
     header(
-        "Location: equipamentos.php"
+        'Location: equipamentos.php'
     );
 
     exit;
 }
+
+
+// ============================================================
+// POST - SALVAR / ATUALIZAR EQUIPAMENTO
+// ============================================================
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $dados = [
+
+        ':empresa' =>
+            !empty($_POST['empresa'])
+                ? (int) $_POST['empresa']
+                : null,
+
+        ':fabricante' =>
+            !empty($_POST['fabricante'])
+                ? (int) $_POST['fabricante']
+                : null,
+
+        ':setor' =>
+            !empty($_POST['setor'])
+                ? (int) $_POST['setor']
+                : null,
+
+        ':responsavel' =>
+            !empty($_POST['responsavel'])
+                ? (int) $_POST['responsavel']
+                : null,
+
+        ':status' =>
+            !empty($_POST['status'])
+                ? (int) $_POST['status']
+                : 1,
+
+        ':tipo' =>
+            !empty($_POST['tipo'])
+                ? (int) $_POST['tipo']
+                : null,
+
+        ':patrimonio' =>
+            trim(
+                $_POST['patrimonio'] ?? ''
+            ),
+
+        ':tag' =>
+            trim(
+                $_POST['tag'] ?? ''
+            ),
+
+        ':nome' =>
+            trim(
+                $_POST['nome'] ?? ''
+            ),
+
+        ':modelo' =>
+            trim(
+                $_POST['modelo'] ?? ''
+            ),
+
+        ':serie' =>
+            trim(
+                $_POST['serie'] ?? ''
+            ),
+
+        ':faixa' =>
+            trim(
+                $_POST['faixa'] ?? ''
+            ),
+
+        ':resolucao' =>
+            trim(
+                $_POST['resolucao'] ?? ''
+            ),
+
+        ':localizacao' =>
+            trim(
+                $_POST['localizacao'] ?? ''
+            ),
+
+        ':data' =>
+            !empty($_POST['data'])
+                ? $_POST['data']
+                : null,
+
+        ':obs' =>
+            trim(
+                $_POST['observacoes']
+                ?? $_POST['obs']
+                ?? ''
+            )
+
+    ];
+
+
+    // ========================================================
+    // ID ATUAL
+    // ========================================================
+
+    $idAtual =
+        !empty($_POST['id'])
+            ? (int) $_POST['id']
+            : 0;
+
+
+    // ========================================================
+    // VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
+    // ========================================================
+
+    if (
+        $dados[':empresa'] === null
+        ||
+        $dados[':fabricante'] === null
+        ||
+        $dados[':setor'] === null
+        ||
+        $dados[':responsavel'] === null
+        ||
+        $dados[':tipo'] === null
+        ||
+        $dados[':patrimonio'] === ''
+        ||
+        $dados[':nome'] === ''
+    ) {
+
+        $_SESSION['erro_equipamento'] =
+            'Preencha todos os campos obrigatórios.';
+
+        header(
+            'Location: equipamentos.php?acao=' .
+            (
+                $idAtual > 0
+                    ? 'editar&id=' . $idAtual
+                    : 'novo'
+            )
+        );
+
+        exit;
+    }
+
+
+    // ========================================================
+    // PATRIMÔNIO DUPLICADO
+    // ========================================================
+
+    if (
+        $controller->existePatrimonio(
+            $dados[':patrimonio'],
+            $idAtual > 0
+                ? $idAtual
+                : null
+        )
+    ) {
+
+        $_SESSION['erro_equipamento'] =
+            'Já existe um equipamento cadastrado com este patrimônio.';
+
+        header(
+            'Location: equipamentos.php?acao=' .
+            (
+                $idAtual > 0
+                    ? 'editar&id=' . $idAtual
+                    : 'novo'
+            )
+        );
+
+        exit;
+    }
+
+
+    // ========================================================
+    // TAG DUPLICADA
+    // ========================================================
+
+    if (
+        $dados[':tag'] !== ''
+        &&
+        $controller->existeTag(
+            $dados[':tag'],
+            $idAtual > 0
+                ? $idAtual
+                : null
+        )
+    ) {
+
+        $_SESSION['erro_equipamento'] =
+            'Já existe um equipamento cadastrado com esta TAG.';
+
+        header(
+            'Location: equipamentos.php?acao=' .
+            (
+                $idAtual > 0
+                    ? 'editar&id=' . $idAtual
+                    : 'novo'
+            )
+        );
+
+        exit;
+    }
+
+
+    // ========================================================
+    // ATUALIZAR
+    // ========================================================
+
+    if ($idAtual > 0) {
+
+        try {
+
+            $controller->atualizar(
+                $idAtual,
+                $dados
+            );
+
+            $_SESSION['sucesso_equipamento'] =
+                'Equipamento atualizado com sucesso.';
+
+            header(
+                "Location: equipamentos.php?acao=editar&id="
+                . $idAtual
+            );
+
+            exit;
+
+        } catch (Throwable $e) {
+
+            $_SESSION['erro_equipamento'] =
+                'Não foi possível atualizar o equipamento.';
+
+            header(
+                "Location: equipamentos.php?acao=editar&id="
+                . $idAtual
+            );
+
+            exit;
+        }
+    }
+
+
+    // ========================================================
+    // NOVO EQUIPAMENTO
+    // ========================================================
+
+    try {
+
+        $controller->salvar(
+            $dados
+        );
+
+        $_SESSION['sucesso_equipamento'] =
+            'Equipamento cadastrado com sucesso.';
+
+        header(
+            "Location: equipamentos.php"
+        );
+
+        exit;
+
+    } catch (Throwable $e) {
+
+        $_SESSION['erro_equipamento'] =
+            'Não foi possível cadastrar o equipamento.';
+
+        header(
+            "Location: equipamentos.php?acao=novo"
+        );
+
+        exit;
+    }
+}
+
+
+// ============================================================
+// MENSAGENS
+// ============================================================
+
+$sucessoEquipamento =
+    $_SESSION['sucesso_equipamento']
+    ?? null;
+
+$erroEquipamento =
+    $_SESSION['erro_equipamento']
+    ?? null;
+
+
+unset(
+    $_SESSION['sucesso_equipamento'],
+    $_SESSION['erro_equipamento']
+);
 
 
 // ============================================================
@@ -196,11 +466,15 @@ switch ($acao) {
 
     case 'listar':
 
-        $equipamentos = $controller->listar();
+        $equipamentos =
+            $controller->listar();
 
         include 'app/views/layouts/header.php';
+
         include 'app/views/layouts/sidebar.php';
+
         include 'app/views/equipamentos/listar.php';
+
         include 'app/views/layouts/footer.php';
 
         break;
@@ -214,19 +488,26 @@ switch ($acao) {
 
         $manutencoes = [];
 
-        $fabricantes = $controller->fabricantes();
+        $fabricantes =
+            $controller->fabricantes();
 
-        $setores = $controller->setores();
+        $setores =
+            $controller->setores();
 
-        $tipos = $controller->tipos();
+        $tipos =
+            $controller->tipos();
 
-        $usuarios = $controller->usuarios();
+        $usuarios =
+            $controller->usuarios();
 
-        $empresas = $controller->empresas();
+        $empresas =
+            $controller->empresas();
 
-        $status = $controller->status();
+        $status =
+            $controller->status();
 
-        $laboratorios = $controller->laboratorios();
+        $laboratorios =
+            $controller->laboratorios();
 
         $modoEdicao = false;
 
@@ -236,9 +517,15 @@ switch ($acao) {
 
         $calibracoes = [];
 
+        $historico = [];
+
+
         include 'app/views/layouts/header.php';
+
         include 'app/views/layouts/sidebar.php';
+
         include 'app/views/equipamentos/form.php';
+
         include 'app/views/layouts/footer.php';
 
         break;
@@ -256,6 +543,7 @@ switch ($acao) {
             FILTER_VALIDATE_INT
         );
 
+
         if (!$id) {
 
             http_response_code(400);
@@ -266,16 +554,9 @@ switch ($acao) {
         }
 
 
-        // ----------------------------------------------------
-        // BUSCA O EQUIPAMENTO
-        // ----------------------------------------------------
+        $equipamento =
+            $controller->buscar($id);
 
-        $equipamento = $controller->buscar($id);
-
-
-        // ----------------------------------------------------
-        // VERIFICA SE EXISTE
-        // ----------------------------------------------------
 
         if (!$equipamento) {
 
@@ -287,25 +568,22 @@ switch ($acao) {
         }
 
 
-        // ----------------------------------------------------
-        // BUSCA ÚLTIMA CALIBRAÇÃO
-        // ----------------------------------------------------
-
         $ultimaCalibracao =
             $controller->ultimaCalibracao($id);
 
-
-        // ----------------------------------------------------
-        // BUSCA HISTÓRICO DE CALIBRAÇÕES
-        // ----------------------------------------------------
 
         $calibracoes =
             $controller->listarCalibracoes($id);
 
 
-        // ----------------------------------------------------
-        // CARREGA OS DADOS DOS SELECTS
-        // ----------------------------------------------------
+        $manutencoes =
+            $manutencaoController
+                ->listarPorEquipamento($id);
+
+
+        $historico =
+            $controller->listarHistorico($id);
+
 
         $fabricantes =
             $controller->fabricantes();
@@ -332,10 +610,6 @@ switch ($acao) {
         $modoEdicao = true;
 
 
-        // ----------------------------------------------------
-        // CARREGA A VIEW
-        // ----------------------------------------------------
-
         include 'app/views/layouts/header.php';
 
         include 'app/views/layouts/sidebar.php';
@@ -359,6 +633,7 @@ switch ($acao) {
             FILTER_VALIDATE_INT
         );
 
+
         if (!$id) {
 
             http_response_code(400);
@@ -368,10 +643,6 @@ switch ($acao) {
             );
         }
 
-
-        // ----------------------------------------------------
-        // BUSCA O EQUIPAMENTO
-        // ----------------------------------------------------
 
         $equipamento =
             $controller->buscar($id);
@@ -387,22 +658,21 @@ switch ($acao) {
         }
 
 
-        // ----------------------------------------------------
-        // BUSCA ÚLTIMA CALIBRAÇÃO
-        // ----------------------------------------------------
-
         $ultimaCalibracao =
             $controller->ultimaCalibracao($id);
 
 
-        // ----------------------------------------------------
-        // BUSCA HISTÓRICO DE CALIBRAÇÕES
-        // ----------------------------------------------------
-
         $calibracoes =
             $controller->listarCalibracoes($id);
 
-            $manutencoes = $manutencaoController->listarPorEquipamento($id);
+
+        $manutencoes =
+            $manutencaoController
+                ->listarPorEquipamento($id);
+
+
+        $historico =
+            $controller->listarHistorico($id);
 
 
         include 'app/views/layouts/header.php';
